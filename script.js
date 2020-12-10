@@ -1,5 +1,7 @@
 var PetRequest = /** @class */ (function () {
     function PetRequest(petType, petPastStatus, petBreedingHistory) {
+        this.requestCreatedAt = new Date();
+        this.requestId = "request_" + Math.floor(Math.random() * 10000);
         this.petType = petType;
         this.petPastStatus = petPastStatus;
         this.petBreedingHistory = petBreedingHistory;
@@ -8,9 +10,10 @@ var PetRequest = /** @class */ (function () {
 }());
 var Animal = /** @class */ (function () {
     function Animal(petType, petPastStatus, petBreedingHistory) {
-        this.petAvailableFrom = null;
+        this.petAvailableFrom = new Date();
         this.isPetAvailable = false;
-        var petNames = ['Mowgli', 'Twinkle', 'Roger', 'Kim', 'King', 'Raju', 'Bella', 'Charlie', 'Max', 'Bailey', 'Cooper', 'Daisy', 'Bruce'];
+        var petNames = ["Mowgli", "Twinkle", "Roger", "Kim", "King", "Raju", "Bella", "Charlie", "Max", "Bailey", "Cooper", "Daisy", "Bruce",];
+        this.petId = "pet_" + Math.floor(Math.random() * 10000);
         this.name = petNames[Math.floor(Math.random() * 13)];
         this.petType = petType;
         this.petPastStatus = petPastStatus;
@@ -27,16 +30,16 @@ var Requirement = /** @class */ (function () {
         this.currentPetRequests.push(request);
         return request;
     };
+    Requirement.prototype.getAllRequests = function () {
+        return this.currentPetRequests;
+    };
     Requirement.prototype.getPetRequestStatus = function (availability) {
         var petRequestStatus = [];
         for (var i = 0; i < 5; i++) {
-            var availableAnimal = availability.getAdoptionStatus(this.currentPetRequests[i]);
-            if (availableAnimal) {
-                petRequestStatus.push({ request: this.currentPetRequests[i], status: true });
-            }
-            else {
-                petRequestStatus.push({ request: this.currentPetRequests[i], status: false });
-            }
+            petRequestStatus.push({
+                request: this.currentPetRequests[i],
+                available: availability.getAdoptionStatus(this.currentPetRequests[i]) !== undefined
+            });
         }
         return petRequestStatus;
     };
@@ -48,7 +51,9 @@ var Availability = /** @class */ (function () {
     }
     Availability.prototype.getAdoptionStatus = function (request) {
         return this.currentAvailablePets.find(function (animal) {
-            if ((animal.petType === request.petType) && (animal.petPastStatus === request.petPastStatus) && (animal.petBreedingHistory === request.petBreedingHistory)) {
+            if (animal.petType === request.petType &&
+                animal.petPastStatus === request.petPastStatus &&
+                animal.petBreedingHistory === request.petBreedingHistory) {
                 return animal;
             }
         });
@@ -58,6 +63,46 @@ var Availability = /** @class */ (function () {
         animal.petAvailableFrom = new Date();
         this.currentAvailablePets.push(animal);
         return this.currentAvailablePets;
+    };
+    Availability.prototype.getPetsCount = function () {
+        var animalCount = { dogs: 0, cats: 0, parrots: 0, rabbits: 0, others: 0 };
+        this.currentAvailablePets.forEach(function (animal) {
+            switch (animal.petType) {
+                case "Dog": {
+                    animalCount.dogs++;
+                    break;
+                }
+                case "Cat": {
+                    animalCount.cats++;
+                    break;
+                }
+                case "Parrot": {
+                    animalCount.parrots++;
+                    break;
+                }
+                case "Rabbit": {
+                    animalCount.rabbits++;
+                    break;
+                }
+                default: {
+                    animalCount.others++;
+                    break;
+                }
+            }
+        });
+        return animalCount;
+    };
+    Availability.prototype.mapAnimalsToRequests = function (requests) {
+        var map = [];
+        var petRequests = requests;
+        this.currentAvailablePets.forEach(function (animal) {
+            var animalToRequestMap = { animal: animal, petRequests: petRequests };
+            animalToRequestMap.petRequests = petRequests.filter(function (request) {
+                return (animal.petType === request.petType) && (animal.petPastStatus === request.petPastStatus) && (animal.petBreedingHistory === request.petBreedingHistory);
+            });
+            map.push(animalToRequestMap);
+        });
+        return map;
     };
     return Availability;
 }());
@@ -76,7 +121,6 @@ var animal9 = new Animal("Rabbit", "Rescued", "Wild");
 var animal10 = new Animal("Cat", "Rescued", "Wild");
 availability.addPetsToStore(animal1);
 availability.addPetsToStore(animal2);
-availability.addPetsToStore(animal2);
 availability.addPetsToStore(animal3);
 availability.addPetsToStore(animal4);
 availability.addPetsToStore(animal5);
@@ -84,12 +128,17 @@ availability.addPetsToStore(animal6);
 availability.addPetsToStore(animal7);
 availability.addPetsToStore(animal8);
 var request1 = new PetRequest("Parrot", "Rescued", "Wild");
-var request2 = new PetRequest("Cat", "Rescued", "Domestic");
+var request2 = new PetRequest("Cat", "Rescued", "Domestic"); // This requirement will not be satisfied
 var request3 = new PetRequest("Rabbit", "Owned", "Domestic");
 var request4 = new PetRequest("Cat", "Owned", "Domestic");
 var request5 = new PetRequest("Dog", "Owned", "Domestic");
 var request6 = new PetRequest("Rabbit", "Rescued", "Wild");
 var request7 = new PetRequest("Dog", "Rescued", "Domestic");
+var request8 = new PetRequest("Dog", "Rescued", "Domestic");
+var request9 = new PetRequest("Dog", "Rescued", "Domestic");
+var request10 = new PetRequest("Dog", "Rescued", "Domestic");
+var request11 = new PetRequest("Dog", "Rescued", "Domestic");
+var request12 = new PetRequest("Dog", "Rescued", "Domestic");
 requirement.putRequest(request1);
 requirement.putRequest(request2);
 requirement.putRequest(request3);
@@ -97,8 +146,14 @@ requirement.putRequest(request4);
 requirement.putRequest(request5);
 requirement.putRequest(request6);
 requirement.putRequest(request7);
+requirement.putRequest(request8);
+requirement.putRequest(request9);
+requirement.putRequest(request10);
+requirement.putRequest(request11);
+requirement.putRequest(request12);
 // console.log(availability, requirement);
 // console.log(animal1);
-console.log(requirement.getPetRequestStatus(availability));
 // Get status of five requirements of the request for animals
-// Check if the animals are available as per the request
+console.log('Pet Availability Status for first 5 Requests', requirement.getPetRequestStatus(availability));
+console.log('Total Pets Count based on the type of pet', availability.getPetsCount());
+console.log('Map of Pet available to current requests', availability.mapAnimalsToRequests(requirement.getAllRequests()));
