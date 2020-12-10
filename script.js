@@ -12,7 +12,7 @@ var Animal = /** @class */ (function () {
     function Animal(petType, petPastStatus, petBreedingHistory) {
         this.petAvailableFrom = new Date();
         this.isPetAvailable = false;
-        var petNames = ["Mowgli", "Twinkle", "Roger", "Kim", "King", "Raju", "Bella", "Charlie", "Max", "Bailey", "Cooper", "Daisy", "Bruce",];
+        var petNames = ["Mowgli", "Twinkle", "Roger", "Kim", "King", "Raju", "Bella", "Charlie", "Max", "Bailey", "Cooper", "Daisy", "Bruce",]; // List of possible pet names
         this.petId = "pet_" + Math.floor(Math.random() * 10000);
         this.name = petNames[Math.floor(Math.random() * 13)];
         this.petType = petType;
@@ -25,6 +25,7 @@ var Requirement = /** @class */ (function () {
     function Requirement() {
         this.currentPetRequests = [];
     }
+    // Method to insert a request for pets
     Requirement.prototype.putRequest = function (request) {
         request.requestCreatedAt = new Date();
         this.currentPetRequests.push(request);
@@ -33,6 +34,7 @@ var Requirement = /** @class */ (function () {
     Requirement.prototype.getAllRequests = function () {
         return this.currentPetRequests;
     };
+    // Method to retrieve the status of the five requests
     Requirement.prototype.getPetRequestStatus = function (availability) {
         var petRequestStatus = [];
         for (var i = 0; i < 5; i++) {
@@ -49,6 +51,7 @@ var Availability = /** @class */ (function () {
     function Availability() {
         this.currentAvailablePets = [];
     }
+    // Method to find the adoption status for the input request
     Availability.prototype.getAdoptionStatus = function (request) {
         return this.currentAvailablePets.find(function (animal) {
             if (animal.petType === request.petType &&
@@ -58,12 +61,14 @@ var Availability = /** @class */ (function () {
             }
         });
     };
+    // Method to make different kinds of animals available at pet store
     Availability.prototype.addPetsToStore = function (animal) {
         animal.isPetAvailable = true;
         animal.petAvailableFrom = new Date();
         this.currentAvailablePets.push(animal);
         return this.currentAvailablePets;
     };
+    // Method to find the number of animals in each type of animals
     Availability.prototype.getPetsCount = function () {
         var animalCount = { dogs: 0, cats: 0, parrots: 0, rabbits: 0, others: 0 };
         this.currentAvailablePets.forEach(function (animal) {
@@ -92,6 +97,7 @@ var Availability = /** @class */ (function () {
         });
         return animalCount;
     };
+    // Method to map the animals in the pet store with the requests made for these pets
     Availability.prototype.mapAnimalsToRequests = function (requests) {
         var map = [];
         var petRequests = requests;

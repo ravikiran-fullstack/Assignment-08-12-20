@@ -34,7 +34,7 @@ class Animal implements PetInfo {
   isPetAvailable: boolean = false;
 
   constructor( petType: PetType, petPastStatus: PetPastStatus, petBreedingHistory: PetBreedingHistory) {
-    let petNames: string[] = [ "Mowgli","Twinkle","Roger","Kim","King","Raju","Bella","Charlie","Max","Bailey","Cooper","Daisy","Bruce",];
+    let petNames: string[] = [ "Mowgli","Twinkle","Roger","Kim","King","Raju","Bella","Charlie","Max","Bailey","Cooper","Daisy","Bruce",]; // List of possible pet names
     this.petId = "pet_"+Math.floor(Math.random() * 10000);
     this.name = petNames[Math.floor(Math.random() * 13)];
     this.petType = petType;
@@ -48,6 +48,7 @@ class Requirement {
 
   constructor() {}
 
+  // Method to insert a request for pets
   putRequest(request: PetRequest): PetRequest {
     request.requestCreatedAt = new Date();
     this.currentPetRequests.push(request);
@@ -58,6 +59,7 @@ class Requirement {
     return this.currentPetRequests;
   }
 
+  // Method to retrieve the status of the five requests
   getPetRequestStatus(availability: Availability): Array<{request: PetRequest, available: boolean}> {
     let petRequestStatus: Array<{request: PetRequest, available: boolean}> = [];
     for (let i = 0; i < 5; i++) {
@@ -75,6 +77,7 @@ class Availability {
 
   constructor() {}
 
+  // Method to find the adoption status for the input request
   getAdoptionStatus(request: PetRequest): Animal | undefined {
     return this.currentAvailablePets.find((animal) => {
       if (
@@ -87,6 +90,7 @@ class Availability {
     });
   }
 
+  // Method to make different kinds of animals available at pet store
   addPetsToStore(animal: Animal): Animal[] {
     animal.isPetAvailable = true;
     animal.petAvailableFrom = new Date();
@@ -94,6 +98,7 @@ class Availability {
     return this.currentAvailablePets;
   }
 
+  // Method to find the number of animals in each type of animals
   getPetsCount(): {dogs:number, cats:number, parrots: number, rabbits: number, others:number}{
     let animalCount = {dogs: 0, cats: 0, parrots: 0, rabbits: 0, others: 0}
     this.currentAvailablePets.forEach(animal => {
@@ -123,6 +128,7 @@ class Availability {
     return animalCount;
   }
 
+  // Method to map the animals in the pet store with the requests made for these pets
   mapAnimalsToRequests(requests: PetRequest[]):Array<{animal: Animal, petRequests: PetRequest[]}>{
     let map: Array<{animal: Animal, petRequests: PetRequest[]}> = []
     const petRequests = requests;
@@ -193,7 +199,6 @@ requirement.putRequest(request12);
 
 // Get status of five requirements of the request for animals
 console.log('Pet Availability Status for first 5 Requests',requirement.getPetRequestStatus(availability));
-
 console.log('Total Pets Count based on the type of pet',availability.getPetsCount());
 console.log('Map of Pet available to current requests',availability.mapAnimalsToRequests(requirement.getAllRequests()));
 
